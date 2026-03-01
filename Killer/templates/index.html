@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TSU Scholarship Management</title>
+    <style>
+        body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+}
+.container {
+    display: flex;
+    height: 100vh;
+}
+.sidebar {
+    width: 250px;
+    background: #8b0d2f;
+    color: white;
+    padding: 20px;
+}
+.sidebar h2 {
+    margin-bottom: 20px;
+}
+.sidebar button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: none;
+    background: none;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+}
+.sidebar button:hover {
+    background: #a3143c;
+}
+.content {
+    flex: 1;
+    padding: 20px;
+    overflow: auto;
+}
+.stats {
+    display: flex;
+    gap: 15px;
+}
+.stat {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    margin-top: 10px;
+}
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+button.primary {
+    background: #8b0d2f;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+button.success {
+    background: green;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+}
+button.danger {
+    background: red;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+}
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+}
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: hsl(0, 0%, 100%);
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+}
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+<!-- Sidebar -->
+    <div class="sidebar">
+        <h2>TSU Scholarship</h2>
+        <button onclick="showSection('dashboard')">Dashboard</button>
+        <button onclick="showSection('scholarships')">Scholarships</button>
+        <button onclick="showSection('applications')">Applications</button>
+    </div>
+<!-- Main Content -->
+<div class="content">
+<!-- Dashboard -->
+    <div id="dashboard" class="section">
+        <h1>Admin Dashboard</h1>
+            <div class="stats">
+                <div class="stat">
+                    <h3>Total Scholarships</h3>
+            <p id="totalScholarships">0</p>
+                </div>
+            <div class="stat">
+                <h3>Total Applications</h3>
+                <p id="totalApplications">0</p>
+        </div>
+<div class="stat">
+            <h3>Approved</h3>
+            <p id="totalApproved">0</p>
+</div>
+            </div>
+    </div>
+<!-- Scholarship Manager -->
+<div id="scholarships" class="section" style="display:none;">
+    <h1>Scholarship Manager</h1>
+    <button class="primary" onclick="openModal()">Add Scholarship</button>
+    <input type="text" id="searchScholarship" placeholder="Search scholarship..."
+onkeyup="searchScholarship()">
+    <table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Slots</th>
+            <th>Deadline</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+        <tbody id="scholarshipTable"></tbody>
+    </table>
+</div>
+<!-- Applications -->
+    <div id="applications" class="section" style="display:none;">
+        <h1>Application Review</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Scholarship</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                    <tbody id="applicationTable"></tbody>
+            </table>
+    </div>
+</div>
+</div>
+<!-- Modal -->
+<div class="modal" id="scholarshipModal">
+    <div class="modal-content">
+        <h3>Add Scholarship</h3>
+        <input type="text" id="schName" placeholder="Name">
+        <input type="number" id="schAmount" placeholder="Amount">
+        <input type="number" id="schSlots" placeholder="Slots">
+        <input type="date" id="schDeadline">
+        <button class="primary" onclick="addScholarship()">Save</button>
+        <button onclick="closeModal()">Cancel</button>
+    </div>
+</div>
+        <script>
+            let scholarships = JSON.parse(localStorage.getItem("scholarships")) || [];
+let applications = JSON.parse(localStorage.getItem("applications")) || [
+    {student:"Juan Dela Cruz", scholarship:"TSU Academic Excellence", status:"Pending"},
+    {student:"Maria Garcia", scholarship:"Financial Assistance", status:"Approved"}
+];
+function saveData(){
+    localStorage.setItem("scholarships", JSON.stringify(scholarships));
+    localStorage.setItem("applications", JSON.stringify(applications));
+    updateDashboard();
+}
+function showSection(id){
+    document.querySelectorAll(".section").forEach(sec=>sec.style.display="none");
+    document.getElementById(id).style.display="block";
+}
+function openModal(){
+    document.getElementById("scholarshipModal").style.display="flex";
+}
+function closeModal(){
+    document.getElementById("scholarshipModal").style.display="none";
+}
+function addScholarship(){
+    let name = document.getElementById("schName").value;
+    let amount = document.getElementById("schAmount").value;
+    let slots = document.getElementById("schSlots").value;
+    let deadline = document.getElementById("schDeadline").value;
+    
+    if(!name) return alert("Please fill all fields");
+
+    scholarships.push({name, amount, slots, deadline});
+    saveData();
+    renderScholarships();
+    closeModal();
+}
+function renderScholarships(){
+    let table = document.getElementById("scholarshipTable");
+    table.innerHTML = "";
+    scholarships.forEach((s,index)=>{
+    table.innerHTML += `
+        <tr>
+            <td>${s.name}</td>
+            <td>${s.amount}</td>
+            <td>${s.slots}</td>
+            <td>${s.deadline}</td>
+                <td>
+                <button class="danger" onclick="deleteScholarship(${index})">Delete</button>
+                </td>
+        </tr>
+`;
+});
+}
+function deleteScholarship(index){
+    scholarships.splice(index,1);
+    saveData();
+    renderScholarships();
+}
+function renderApplications(){
+    let table = document.getElementById("applicationTable");
+    table.innerHTML = "";
+    applications.forEach((a,index)=>{
+    table.innerHTML += `
+        <tr>
+            <td>${a.student}</td>
+            <td>${a.scholarship}</td>
+            <td>${a.status}</td>
+            <td>
+            <button class="success" onclick="approve(${index})">Approve</button>
+            <button class="danger" onclick="reject(${index})">Reject</button>
+            </td>
+        </tr>
+`;
+});
+}
+function approve(index){
+    applications[index].status="Approved";
+    saveData();
+    renderApplications();
+}
+function reject(index){
+    applications[index].status="Rejected";
+    saveData();
+    renderApplications();
+}
+function searchScholarship(){
+    let input = document.getElementById("searchScholarship").value.toLowerCase();
+    let rows = document.querySelectorAll("#scholarshipTable tr");
+    rows.forEach(row=>{
+    row.style.display = row.innerText.toLowerCase().includes(input) ? "" : "none";
+});
+}
+function updateDashboard(){
+    document.getElementById("totalScholarships").innerText = scholarships.length;
+    document.getElementById("totalApplications").innerText = applications.length;
+    document.getElementById("totalApproved").innerText =
+    applications.filter(a=>a.status==="Approved").length;
+}
+renderScholarships();
+renderApplications();
+updateDashboard();
+
+        </script>
+</body>
+</html>

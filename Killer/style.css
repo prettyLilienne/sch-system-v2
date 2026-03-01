@@ -1,0 +1,101 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+}
+.container {
+    display: flex;
+    height: 100vh;
+}
+.sidebar {
+    width: 250px;
+    background: #8b0d2f;
+    color: white;
+    padding: 20px;
+}
+.sidebar h2 {
+    margin-bottom: 20px;
+}
+.sidebar button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: none;
+    background: none;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+}
+.sidebar button:hover {
+    background: #a3143c;
+}
+.content {
+    flex: 1;
+    padding: 20px;
+    overflow: auto;
+}
+.stats {
+    display: flex;
+    gap: 15px;
+}
+.stat {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    margin-top: 10px;
+}
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+button.primary {
+    background: #8b0d2f;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+button.success {
+    background: green;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+}
+button.danger {
+    background: red;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+}
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+}
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: hsl(0, 0%, 100%);
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+}
